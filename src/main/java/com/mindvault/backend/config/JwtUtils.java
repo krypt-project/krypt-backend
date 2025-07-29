@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -12,29 +13,26 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtils {
-    private String secret;
+
+    @Value("${jwt.secret}")
+    private String SECRET;
     private final long expirationTime = 1000 * 60 * 60;
 
     private Key getKey() {
-        byte[] keyBytes = secret.getBytes();
+        byte[] keyBytes = SECRET.getBytes();
         if (keyBytes.length < 32) {
             throw new RuntimeException("JWT secret must be at least 32 characters long");
         }
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String email, String username) {
+    public String generateToken(String email) {
         return Jwts.builder()
-                .setSubject(username)
-                .claim("email", email)
+                .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    public String getEmailFromToken(String token) {
-        return extractClaim(token, claims -> claims.get("email", String.class));
     }
 
     public String extractUsername(String token) {
