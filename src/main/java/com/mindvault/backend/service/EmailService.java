@@ -1,5 +1,6 @@
 package com.mindvault.backend.service;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -13,17 +14,18 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public void sendEmail(String to, String subject, String body) {
+    public void sendEmail(String to, String subject, String htmlContent) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(body, true);
+            helper.setText(htmlContent, true);
+            helper.setFrom("contact@mindvault.dev");
 
             mailSender.send(message);
-        } catch (Exception e) {
+        } catch (MessagingException e) {
             throw new RuntimeException("Error while sending mail : ", e);
         }
     }
