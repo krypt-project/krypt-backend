@@ -9,10 +9,11 @@ import java.time.LocalDateTime;
 public class UserSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "userSession_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false, unique = true)
@@ -20,6 +21,8 @@ public class UserSession {
 
     @Column(nullable = false)
     private LocalDateTime expirationData;
+
+    // Constructor
 
     public UserSession() {}
 
