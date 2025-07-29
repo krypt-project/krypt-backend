@@ -1,116 +1,180 @@
 package com.mindvault.backend.service;
 
 import com.mindvault.backend.config.JwtUtils;
-import com.mindvault.backend.dto.AuthenticationDTO;
+import com.mindvault.backend.dto.UserDTO.AuthenticationDTO;
+import com.mindvault.backend.dto.UserDTO.PasswordChangeDTO;
+import com.mindvault.backend.dto.UserDTO.RegisterDTO;
+import com.mindvault.backend.model.Token;
 import com.mindvault.backend.model.User;
-import com.mindvault.backend.model.UserSession;
-import com.mindvault.backend.model.VerificationToken;
+import com.mindvault.backend.model.enums.TokenType;
+import com.mindvault.backend.repository.TokenRepository;
 import com.mindvault.backend.repository.UserRepository;
-import com.mindvault.backend.repository.UserSessionRepository;
-import com.mindvault.backend.repository.VerificationTokenRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
-import java.net.URI;
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final JwtUtils jwtUtils;
-    private final UserSessionRepository userSessionRepository;
-    private final VerificationTokenRepository verificationTokenRepository;
-    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final JwtUtils jwtUtils;
+    private final AuthenticationManager authenticationManager;
+    private final TokenRepository tokenRepository;
+    private final EmailService emailService;
 
-    public UserService(UserRepository userRepository, JwtUtils jwtUtils, UserSessionRepository userSessionRepository, VerificationTokenRepository verificationTokenRepository, EmailService emailService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TokenRepository tokenRepository, EmailService emailService) {
         this.userRepository = userRepository;
-        this.jwtUtils = jwtUtils;
-        this.userSessionRepository = userSessionRepository;
-        this.verificationTokenRepository = verificationTokenRepository;
-        this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
+        this.authenticationManager = authenticationManager;
+        this.tokenRepository = tokenRepository;
+        this.emailService = emailService;
     }
 
-    public String authenticateUser(AuthenticationDTO authenticationDTO) {
-        User user = userRepository.findByEmailUser(authenticationDTO.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (!user.isEmailVerified()) {
-            sendVerificationEmail(user);
-            throw new RuntimeException("Please verify your email. A verification email has been sent to your account.");
+    public void register(RegisterDTO registerDTO) {
+        if (userRepository.findByEmail(registerDTO.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
         }
 
-        if (!passwordEncoder.matches(authenticationDTO.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password.");
-        }
+        User user = new User();
+        user.setFirstName(registerDTO.getFirstName());
+        user.setLastName(registerDTO.getLastName());
+        user.setEmail(registerDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+        userRepository.save(user);
 
-        String username = user.getFirstName();
-        String token = generateUserSession(user, username);
+        String tokenValue = UUID.randomUUID().toString();
+        Token token = new Token();
+        token.setToken(tokenValue);
+        token.setTokenType(TokenType.VERIFY_EMAIL);
+        token.setExpired(false);
+        token.setRevoked(false);
+        token.setUser(user);
+        tokenRepository.save(token);
 
-        logger.info("User information : {}", username);
-
-        return token;
-    }
-
-    private String generateUserSession(User user, String username) {
-        String token = jwtUtils.generateToken(user.getEmail(), username);
-        UserSession userSession = new UserSession(user, token, LocalDateTime.now().plusHours(1));
-        userSessionRepository.save(userSession);
-        return token;
-    }
-
-    private void sendVerificationEmail(User user) {
-        sendEmailVerification(user);
-    }
-
-    public void sendEmailVerification(User user) {
-        if (user.isEmailVerified()) {
-            throw new RuntimeException("Email is already verified.");
-        }
-
-        String token = jwtUtils.generateToken(user.getEmail(), user.getFirstName());
-        LocalDateTime expirationDate = LocalDateTime.now().plusMinutes(15);
-
-        VerificationToken verificationToken = new VerificationToken(token, user, expirationDate);
-        verificationTokenRepository.save(verificationToken);
-
-        String verificationLink = "https://mindvault/auth/verify-email?token=" + token;
-
-        StringBuilder emailBody = new StringBuilder();
-        emailBody.append("<p>Welcome to MindVault app !</p>");
-        emailBody.append("<p>Clique on the link below to validate your account creation :</p>");
-        emailBody.append("<a href='").append(verificationLink).append("'>Validate my account</a>");
-
+        String verificationLink = "http://localhost:8080/mindvault/auth/verify?token=" + tokenValue;
         emailService.sendEmail(
                 user.getEmail(),
-                "MindVault account verification link",
-                emailBody.toString()
+                "Vérification de votre compte MindVault",
+                "<!DOCTYPE html>" +
+                        "<html lang='fr'>" +
+                        "<head>" +
+                        "<meta charset='UTF-8'>" +
+                        "<style>" +
+                        "  body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }" +
+                        "  .container { background-color: #fff; border-radius: 8px; padding: 30px; max-width: 600px; margin: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }" +
+                        "  h2 { color: #2c3e50; }" +
+                        "  p { font-size: 16px; color: #333; }" +
+                        "  .button { display: inline-block; padding: 12px 24px; margin-top: 20px; background-color: #3498db; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; }" +
+                        "  .footer { margin-top: 40px; font-size: 13px; color: #777; text-align: center; }" +
+                        "</style>" +
+                        "</head>" +
+                        "<body>" +
+                        "<div class='container'>" +
+                        "<h2>Bienvenue " + user.getFirstName() + " !</h2>" +
+                        "<p>Merci de vous être inscrit sur <strong>MindVault</strong>.</p>" +
+                        "<p>Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous :</p>" +
+                        "<a class='button' href='" + verificationLink + "'>Activer mon compte</a>" +
+                        "<p style='margin-top: 30px;'>Si vous n’avez pas créé de compte, ignorez simplement ce message.</p>" +
+                        "<div class='footer'>" +
+                        "<p>La team MindVault</p>" +
+                        "<img src='https://imgur.com/4CavgRB' alt='Logo' style='max-width: 65px; margin-top: 10px; border-radius:50%;'/>" +
+                        "</div>" +
+                        "</div>" +
+                        "</body>" +
+                        "</html>"
         );
     }
 
-    public ResponseEntity<?> verifyEmail(String token) {
-        String email = jwtUtils.getEmailFromToken(token);
-        User user = userRepository.findByEmailUser(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void resendVerificationEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (jwtUtils.isTokenExpired(token)) {
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create("http://mindvault/..."))
-                    .build();
+        if (user.isEmailVerified()) {
+            throw new RuntimeException("User already verified");
         }
 
-        user.setEmailVerified(true);
-        userRepository.save(user);
+        String tokenValue = UUID.randomUUID().toString();
+        Token token = new Token();
+        token.setToken(tokenValue);
+        token.setTokenType(TokenType.VERIFY_EMAIL);
+        token.setExpired(false);
+        token.setRevoked(false);
+        token.setUser(user);
+        tokenRepository.save(token);
 
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("http://mindvault/..."))
-                .build();
+        String verificationLink = "http://localhost:8080/api/auth/verify?token=" + tokenValue;
+        emailService.sendEmail(
+                user.getEmail(),
+                "Vérification de votre compte IVI",
+                "<!DOCTYPE html>" +
+                        "<html lang='fr'>" +
+                        "<head>" +
+                        "<meta charset='UTF-8'>" +
+                        "<style>" +
+                        "  body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }" +
+                        "  .container { background-color: #fff; border-radius: 8px; padding: 30px; max-width: 600px; margin: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }" +
+                        "  h2 { color: #2c3e50; }" +
+                        "  p { font-size: 16px; color: #333; }" +
+                        "  .button { display: inline-block; padding: 12px 24px; margin-top: 20px; background-color: #3498db; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; }" +
+                        "  .footer { margin-top: 40px; font-size: 13px; color: #777; text-align: center; }" +
+                        "</style>" +
+                        "</head>" +
+                        "<body>" +
+                        "<div class='container'>" +
+                        "<h2>Bienvenue " + user.getFirstName() + " !</h2>" +
+                        "<p>Merci de vous être inscrit sur <strong>IVI</strong>.</p>" +
+                        "<p>Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous :</p>" +
+                        "<a class='button' href='" + verificationLink + "'>Activer mon compte</a>" +
+                        "<p style='margin-top: 30px;'>Si vous n’avez pas créé de compte, ignorez simplement ce message.</p>" +
+                        "<div class='footer'>" +
+                        "<p>La team IVI</p>" +
+                        "<img src='https://i.imgur.com/XYMp0vv.png' alt='Logo' style='max-width: 65px; margin-top: 10px;'/>" +
+                        "</div>" +
+                        "</div>" +
+                        "</body>" +
+                        "</html>"
+        );
     }
 
+    public String authenticateUser(AuthenticationDTO authenticationDTO) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authenticationDTO.getEmail(), authenticationDTO.getPassword())
+        );
+
+        String jwt = jwtUtils.generateToken(authentication.getName());
+
+        User user = userRepository.findByEmail(authenticationDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Token> oldTokens = tokenRepository.findAllByUser(user);
+        oldTokens.stream().filter(t -> t.isExpired() || t.isRevoked()).forEach(tokenRepository::delete);
+
+        Token token = new Token();
+        token.setToken(jwt);
+        token.setUser(user);
+        token.setTokenType(TokenType.ACCESS);
+        token.setExpired(false);
+        token.setRevoked(false);
+        tokenRepository.save(token);
+
+        return jwt;
+    }
+
+    public void changePassword(String email, PasswordChangeDTO passwordChangeDTO) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(passwordChangeDTO.getOldPassword(), user.getPassword())) {
+            throw new RuntimeException("Old password does not match");
+        }
+
+        user.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
+        userRepository.save(user);
+    }
 }
