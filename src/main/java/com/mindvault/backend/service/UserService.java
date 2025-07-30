@@ -163,7 +163,16 @@ public class UserService {
         token.setRevoked(false);
         tokenRepository.save(token);
 
-        return jwt;
+        String apiToken = UUID.randomUUID().toString();
+        Token aiToken = new Token();
+        aiToken.setToken(apiToken);
+        aiToken.setUser(user);
+        aiToken.setTokenType(TokenType.API_AI_ACCESS);
+        aiToken.setExpired(false);
+        aiToken.setRevoked(false);
+        tokenRepository.save(aiToken);
+
+        return jwt + "|" + apiToken;
     }
 
     public void changePassword(String email, PasswordChangeDTO passwordChangeDTO) {
