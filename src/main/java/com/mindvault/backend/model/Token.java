@@ -4,7 +4,7 @@ import com.mindvault.backend.model.enums.TokenType;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "token")
+@Table(name = "token_table")
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
