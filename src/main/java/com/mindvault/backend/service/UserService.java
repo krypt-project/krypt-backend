@@ -58,7 +58,7 @@ public class UserService {
         token.setUser(user);
         tokenRepository.save(token);
 
-        String verificationLink = "http://localhost:8080/mindvault/auth/verify?token=" + tokenValue;
+        String verificationLink = "http://localhost:8080/api/auth/verify?token=" + tokenValue;
         emailService.sendEmail(
                 user.getEmail(),
                 "Vérification de votre compte MindVault",
