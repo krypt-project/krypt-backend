@@ -23,7 +23,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin("https://mindvault")
+@CrossOrigin("http://mindvault")
 public class AuthenticationController {
     private final UserService userService;
     private final UserRepository userRepository;
@@ -39,7 +39,7 @@ public class AuthenticationController {
         this.jwtUtils = jwtUtils;
     }
 
-    @GetMapping("/register")
+    @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO) {
         userService.register(registerDTO);
         return ResponseEntity.ok("User registered successfully");
