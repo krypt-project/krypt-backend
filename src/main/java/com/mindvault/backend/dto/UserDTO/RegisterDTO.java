@@ -16,7 +16,6 @@ public class RegisterDTO {
     }
 
     // Getter & Setter
-
     public String getFirstName() {
         return firstName;
     }

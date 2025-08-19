@@ -14,7 +14,6 @@ public class UserDTO {
     }
 
     // Getter & Setter
-
     public Long getId() {
         return id;
     }

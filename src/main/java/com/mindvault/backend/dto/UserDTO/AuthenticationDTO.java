@@ -14,7 +14,6 @@ public class AuthenticationDTO {
     }
 
     // Getter & Setter
-
     public String getEmail() {
         return email;
     }

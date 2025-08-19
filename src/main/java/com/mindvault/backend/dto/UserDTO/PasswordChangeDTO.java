@@ -12,7 +12,6 @@ public class PasswordChangeDTO {
     }
 
     // Getter & Setter
-
     public String getOldPassword() {
         return oldPassword;
     }
