@@ -40,7 +40,7 @@ public class NoteService {
         return note;
     }
 
-    public Note updateNote(Long noteID, NoteDTO noteDTO, User user) {
+    public Note updateNote(Long noteID, User user, NoteDTO noteDTO) {
         Note note = getNoteById(noteID, user);
         note.setTitle(noteDTO.getTitle());
         note.setContent(noteDTO.getContent());
