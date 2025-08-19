@@ -32,8 +32,12 @@ public class NoteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<NoteResponseDTO>> getUserNotes(@AuthenticationPrincipal String email) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+    public ResponseEntity<List<NoteResponseDTO>> getUserNotes(@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal) {
+        String email = principal.getUsername();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         List<NoteResponseDTO> notes = noteService.getUserNotes(user)
                 .stream()
                 .map(this::toResponseDTO)
@@ -41,6 +45,7 @@ public class NoteController {
 
         return ResponseEntity.ok(notes);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<NoteResponseDTO> getNote(@AuthenticationPrincipal String email, @PathVariable Long id) {
