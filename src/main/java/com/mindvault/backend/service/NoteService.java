@@ -28,7 +28,18 @@ public class NoteService {
     }
 
     public List<Note> getUserNotes(User user) {
-        return noteRepository.findByUser(user);
+        List<Note> notes = noteRepository.findByUser(user);
+
+        if (notes.isEmpty()) {
+            Note defaultNote = new Note();
+            defaultNote.setUser(user);
+            defaultNote.setTitle("Untitled");
+            defaultNote.setContent("");
+            noteRepository.save(defaultNote);
+            notes.add(defaultNote);
+        }
+
+        return notes;
     }
 
     public Note getNoteById(Long noteID, User user) {
