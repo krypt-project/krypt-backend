@@ -42,6 +42,25 @@ public class NoteController {
         return ResponseEntity.ok(notes);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<NoteResponseDTO> getNote(@AuthenticationPrincipal String email, @PathVariable Long id) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return ResponseEntity.ok(toResponseDTO(noteService.getNoteById(id, user)));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<NoteResponseDTO> updateNote(@AuthenticationPrincipal String email, @PathVariable Long id, @RequestBody NoteDTO noteDTO) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return ResponseEntity.ok(toResponseDTO(noteService.updateNote(id, user, noteDTO)));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteNote(@AuthenticationPrincipal String email, @PathVariable Long id) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        noteService.deleteNote(id, user);
+        return ResponseEntity.noContent().build();
+    }
+
     private NoteResponseDTO toResponseDTO(Note note) {
         NoteResponseDTO noteResponseDTO = new NoteResponseDTO();
         noteResponseDTO.setId(note.getId());
