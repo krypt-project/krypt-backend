@@ -1,4 +1,54 @@
 package com.mindvault.backend.service;
 
+import com.mindvault.backend.dto.NoteDTO.NoteDTO;
+import com.mindvault.backend.model.Note;
+import com.mindvault.backend.model.User;
+import com.mindvault.backend.repository.NoteRepository;
+import com.mindvault.backend.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
 public class NoteService {
+    private final NoteRepository noteRepository;
+    private final UserRepository userRepository;
+
+    public NoteService(NoteRepository noteRepository, UserRepository userRepository) {
+        this.noteRepository = noteRepository;
+        this.userRepository = userRepository;
+    }
+
+    public Note createNote(User user, NoteDTO noteDTO) {
+        Note note = new Note();
+        note.setUser(user);
+        note.setTitle(noteDTO.getTitle());
+        note.setContent(noteDTO.getContent());
+        return noteRepository.save(note);
+    }
+
+    public List<Note> getUserNotes(User user) {
+        return noteRepository.findByUser(user);
+    }
+
+    public Note getNoteById(Long noteID, User user) {
+        Note note = noteRepository.findById(noteID).orElseThrow();
+        if (!note.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized access");
+        }
+
+        return note;
+    }
+
+    public Note updateNote(Long noteID, NoteDTO noteDTO, User user) {
+        Note note = getNoteById(noteID, user);
+        note.setTitle(noteDTO.getTitle());
+        note.setContent(noteDTO.getContent());
+        return noteRepository.save(note);
+    }
+
+    public void deleteNote(Long noteID, User user) {
+        Note note = getNoteById(noteID, user);
+        noteRepository.delete(note);
+    }
 }
