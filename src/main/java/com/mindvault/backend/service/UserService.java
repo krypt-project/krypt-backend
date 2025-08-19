@@ -172,7 +172,7 @@ public class UserService {
         aiToken.setRevoked(false);
         tokenRepository.save(aiToken);
 
-        return jwt + "|" + apiToken;
+        return jwt;
     }
 
     public void changePassword(String email, PasswordChangeDTO passwordChangeDTO) {
