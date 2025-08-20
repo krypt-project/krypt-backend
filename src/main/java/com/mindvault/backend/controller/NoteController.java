@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,18 +26,17 @@ public class NoteController {
     }
 
     @PostMapping
-    public ResponseEntity<NoteResponseDTO> createNote(@AuthenticationPrincipal String email, @RequestBody NoteDTO noteDTO) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+    public ResponseEntity<NoteResponseDTO> createNote(Principal principal, @RequestBody NoteDTO noteDTO) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found: " + email));
         Note note = noteService.createNote(user, noteDTO);
         return ResponseEntity.ok(toResponseDTO(note));
     }
 
     @GetMapping
-    public ResponseEntity<List<NoteResponseDTO>> getUserNotes(@AuthenticationPrincipal org.springframework.security.core.userdetails.User principal) {
-        String email = principal.getUsername();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public ResponseEntity<List<NoteResponseDTO>> getUserNotes(Principal principal) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found: " + email));
 
         List<NoteResponseDTO> notes = noteService.getUserNotes(user)
                 .stream()
@@ -46,22 +46,24 @@ public class NoteController {
         return ResponseEntity.ok(notes);
     }
 
-
     @GetMapping("/{id}")
-    public ResponseEntity<NoteResponseDTO> getNote(@AuthenticationPrincipal String email, @PathVariable Long id) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+    public ResponseEntity<NoteResponseDTO> getNote(Principal principal, @PathVariable Long id) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found: " + email));
         return ResponseEntity.ok(toResponseDTO(noteService.getNoteById(id, user)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NoteResponseDTO> updateNote(@AuthenticationPrincipal String email, @PathVariable Long id, @RequestBody NoteDTO noteDTO) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+    public ResponseEntity<NoteResponseDTO> updateNote(Principal principal, @PathVariable Long id, @RequestBody NoteDTO noteDTO) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found: " + email));
         return ResponseEntity.ok(toResponseDTO(noteService.updateNote(id, user, noteDTO)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNote(@AuthenticationPrincipal String email, @PathVariable Long id) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+    public ResponseEntity<Void> deleteNote(Principal principal, @PathVariable Long id) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found: " + email));
         noteService.deleteNote(id, user);
         return ResponseEntity.noContent().build();
     }
