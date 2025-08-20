@@ -33,7 +33,7 @@ public class NoteService {
         if (notes.isEmpty()) {
             Note defaultNote = new Note();
             defaultNote.setUser(user);
-            defaultNote.setTitle("Untitled");
+            defaultNote.setTitle("Untitled 1");
             defaultNote.setContent("");
             noteRepository.save(defaultNote);
             notes.add(defaultNote);
