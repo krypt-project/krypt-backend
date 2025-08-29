@@ -147,7 +147,10 @@ public class UserService {
                 new UsernamePasswordAuthenticationToken(authenticationDTO.getEmail(), authenticationDTO.getPassword())
         );
 
-        String jwt = jwtUtils.generateToken(authentication.getName());
+        String jwt = jwtUtils.generateToken(
+                authentication.getName(),
+                "notes:read", "notes:write", "ai:predict"
+        );
 
         User user = userRepository.findByEmail(authenticationDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -162,15 +165,6 @@ public class UserService {
         token.setExpired(false);
         token.setRevoked(false);
         tokenRepository.save(token);
-
-        String apiToken = UUID.randomUUID().toString();
-        Token aiToken = new Token();
-        aiToken.setToken(apiToken);
-        aiToken.setUser(user);
-        aiToken.setTokenType(TokenType.API_AI_ACCESS);
-        aiToken.setExpired(false);
-        aiToken.setRevoked(false);
-        tokenRepository.save(aiToken);
 
         return jwt;
     }
