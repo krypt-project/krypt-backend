@@ -149,7 +149,7 @@ public class UserService {
 
         String jwt = jwtUtils.generateToken(
                 authentication.getName(),
-                "notes:read", "notes:write", "ai:predict"
+                "notes:read", "notes:write", "notes:tags"
         );
 
         User user = userRepository.findByEmail(authenticationDTO.getEmail())
