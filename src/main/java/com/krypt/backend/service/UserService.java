@@ -1,14 +1,14 @@
-package com.mindvault.backend.service;
+package com.krypt.backend.service;
 
-import com.mindvault.backend.config.JwtUtils;
-import com.mindvault.backend.dto.UserDTO.AuthenticationDTO;
-import com.mindvault.backend.dto.UserDTO.PasswordChangeDTO;
-import com.mindvault.backend.dto.UserDTO.RegisterDTO;
-import com.mindvault.backend.model.Token;
-import com.mindvault.backend.model.User;
-import com.mindvault.backend.model.enums.TokenType;
-import com.mindvault.backend.repository.TokenRepository;
-import com.mindvault.backend.repository.UserRepository;
+import com.krypt.backend.config.JwtUtils;
+import com.krypt.backend.dto.UserDTO.AuthenticationDTO;
+import com.krypt.backend.dto.UserDTO.PasswordChangeDTO;
+import com.krypt.backend.dto.UserDTO.RegisterDTO;
+import com.krypt.backend.model.Token;
+import com.krypt.backend.model.User;
+import com.krypt.backend.model.enums.TokenType;
+import com.krypt.backend.repository.TokenRepository;
+import com.krypt.backend.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

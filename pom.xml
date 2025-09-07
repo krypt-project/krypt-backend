@@ -8,11 +8,11 @@
 		<version>3.5.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.mindvault</groupId>
+	<groupId>com.krypt</groupId>
 	<artifactId>backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>mindvault-backend</name>
-	<description>Backend API for MindVault</description>
+	<name>krypt-backend</name>
+	<description>Backend API for Krypt</description>
 	<url/>
 	<licenses>
 		<license/>

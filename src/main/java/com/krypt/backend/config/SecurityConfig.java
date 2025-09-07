@@ -1,6 +1,6 @@
-package com.mindvault.backend.config;
+package com.krypt.backend.config;
 
-import com.mindvault.backend.controller.AuthenticationController;
+import com.krypt.backend.controller.AuthenticationController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

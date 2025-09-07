@@ -1,4 +1,4 @@
-package com.mindvault.backend.model;
+package com.krypt.backend.model;
 
 import jakarta.persistence.*;
 

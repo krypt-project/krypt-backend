@@ -1,4 +1,4 @@
-package com.mindvault.backend.dto.NoteDTO;
+package com.krypt.backend.dto.NoteDTO;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.mindvault.backend.config;
+package com.krypt.backend.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

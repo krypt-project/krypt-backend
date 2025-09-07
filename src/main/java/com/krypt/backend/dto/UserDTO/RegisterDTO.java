@@ -1,4 +1,4 @@
-package com.mindvault.backend.dto.UserDTO;
+package com.krypt.backend.dto.UserDTO;
 
 public class RegisterDTO {
     private String firstName;

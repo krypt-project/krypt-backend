@@ -1,4 +1,4 @@
-package com.mindvault.backend.config;
+package com.krypt.backend.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

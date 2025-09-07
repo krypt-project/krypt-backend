@@ -1,13 +1,12 @@
-package com.mindvault.backend.controller;
+package com.krypt.backend.controller;
 
-import com.mindvault.backend.dto.NoteDTO.NoteDTO;
-import com.mindvault.backend.dto.NoteDTO.NoteResponseDTO;
-import com.mindvault.backend.model.Note;
-import com.mindvault.backend.model.User;
-import com.mindvault.backend.repository.UserRepository;
-import com.mindvault.backend.service.NoteService;
+import com.krypt.backend.dto.NoteDTO.NoteDTO;
+import com.krypt.backend.dto.NoteDTO.NoteResponseDTO;
+import com.krypt.backend.model.Note;
+import com.krypt.backend.model.User;
+import com.krypt.backend.repository.UserRepository;
+import com.krypt.backend.service.NoteService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;

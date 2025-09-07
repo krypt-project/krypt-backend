@@ -1,10 +1,10 @@
-package com.mindvault.backend.service;
+package com.krypt.backend.service;
 
-import com.mindvault.backend.dto.NoteDTO.NoteDTO;
-import com.mindvault.backend.model.Note;
-import com.mindvault.backend.model.User;
-import com.mindvault.backend.repository.NoteRepository;
-import com.mindvault.backend.repository.UserRepository;
+import com.krypt.backend.dto.NoteDTO.NoteDTO;
+import com.krypt.backend.model.Note;
+import com.krypt.backend.model.User;
+import com.krypt.backend.repository.NoteRepository;
+import com.krypt.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.mindvault.backend.model.enums;
+package com.krypt.backend.model.enums;
 
 public enum TokenType {
     ACCESS,

@@ -1,6 +1,6 @@
-package com.mindvault.backend.model;
+package com.krypt.backend.model;
 
-import com.mindvault.backend.model.enums.TokenType;
+import com.krypt.backend.model.enums.TokenType;
 import jakarta.persistence.*;
 
 @Entity

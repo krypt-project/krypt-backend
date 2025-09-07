@@ -1,4 +1,4 @@
-package com.mindvault.backend.service;
+package com.krypt.backend.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -22,7 +22,7 @@ public class EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
-            helper.setFrom("contact@mindvault.dev");
+            helper.setFrom("contact@krypt.dev");
 
             mailSender.send(message);
         } catch (MessagingException e) {

@@ -1,7 +1,7 @@
-package com.mindvault.backend.repository;
+package com.krypt.backend.repository;
 
-import com.mindvault.backend.model.Token;
-import com.mindvault.backend.model.User;
+import com.krypt.backend.model.Token;
+import com.krypt.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,7 +1,6 @@
-package com.mindvault.backend.dto.NoteDTO;
+package com.krypt.backend.dto.NoteDTO;
 
 import lombok.Data;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 

@@ -1,7 +1,7 @@
-package com.mindvault.backend.config;
+package com.krypt.backend.config;
 
-import com.mindvault.backend.model.User;
-import com.mindvault.backend.repository.UserRepository;
+import com.krypt.backend.model.User;
+import com.krypt.backend.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
