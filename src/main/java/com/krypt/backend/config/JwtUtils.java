@@ -16,7 +16,7 @@ public class JwtUtils {
 
     @Value("${jwt.secret}")
     private String SECRET;
-    private final long expirationTime = 1000 * 60 * 60;
+    private final long expirationTime = 1000 * 60 * 60 * 24;
 
     private Key getKey() {
         byte[] keyBytes = SECRET.getBytes();

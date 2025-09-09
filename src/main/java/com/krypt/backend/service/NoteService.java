@@ -58,8 +58,9 @@ public class NoteService {
         return noteRepository.save(note);
     }
 
-    public void deleteNote(Long noteID, User user) {
+    public Note deleteNote(Long noteID, User user) {
         Note note = getNoteById(noteID, user);
         noteRepository.delete(note);
+        return note;
     }
 }
