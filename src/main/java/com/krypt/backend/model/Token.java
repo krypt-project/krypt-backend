@@ -29,7 +29,6 @@ public class Token {
     private User user;
 
     // Constructor
-
     public Token() {}
 
     public Token(Long id, String token, TokenType tokenType, boolean expired, boolean revoked, User user) {

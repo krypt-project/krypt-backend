@@ -5,6 +5,13 @@ INSERT INTO user_table(last_name, first_name, email, password, creation_date, mo
 ('Martin', 'Bob', 'bob.martin@example.com', '$2y$10$eqjReaDGnKGfJbGHGib7te.mCZoaLDmcby8GYw1jlIpVoLZykM4kq', '2025-08-01T11:00:00', '2025-08-01T11:00:00', false),
 ('Lemoine', 'Claire', 'claire.lemoine@example.com', '$2y$10$eqjReaDGnKGfJbGHGib7te.mCZoaLDmcby8GYw1jlIpVoLZykM4kq', '2025-08-01T12:00:00', '2025-08-01T12:00:00', true);
 
+-- Role
+INSERT INTO role_table(role_type, max_storage_gb, ai_quota, price_per_month, description) VALUES
+('STUDENT', 5, 1000, 0.00, 'Student plan: free, 5 GB storage, 1000 AI requests/month, recharge available'),
+('INDIVIDUAL', 20, 5000, 9.99, 'Individual plan: 20 GB storage, 5000 AI requests/month, recharge available'),
+('PROFESSIONAL', 50, 20000, 19.99, 'Professional plan: 50 GB storage, 20000 AI requests/month, priority support, modules available'),
+('COMPANIES', 500, 100000, NULL, 'Enterprise plan: custom storage and quotas, multi-user management, API, SSO, reporting, dedicated support, modules available');
+
 --Tag
 INSERT INTO tag_table(name) VALUES
 -- Organisation / Travail
