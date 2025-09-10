@@ -37,6 +37,41 @@ public class UserService {
         this.emailService = emailService;
     }
 
+    private String buildVerificationEmail(User user, String verificationLink) {
+        return "<!DOCTYPE html>" +
+                "<html lang='en'>" +
+                "<head>" +
+                "<meta charset='UTF-8'>" +
+                "<style>" +
+                "  body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }" +
+                "  .container { background-color: #fff; border-radius: 8px; padding: 30px; max-width: 600px; margin: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }" +
+                "  h2 { color: #171717; }" +
+                "  p { font-size: 16px; color: #333; line-height: 1.5; }" +
+                "  .button { display: inline-block; padding: 12px 24px; margin-top: 20px;" +
+                "            background: linear-gradient(to right, #5554dc, #00b0cf);" +
+                "            color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;" +
+                "            transition: opacity 0.3s; }" +
+                "  .button:hover { opacity: 0.9; }" +
+                "  .footer { margin-top: 40px; font-size: 13px; color: #777; text-align: center; }" +
+                "  .footer img { max-width: 65px; margin-top: 10px; border-radius: 50%; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<h2>Welcome " + user.getFirstName() + "!</h2>" +
+                "<p>Thank you for signing up for <strong>Krypt</strong>.</p>" +
+                "<p>To activate your account, please click the button below:</p>" +
+                "<a class='button' href='" + verificationLink + "'>Activate My Account</a>" +
+                "<p style='margin-top: 30px;'>If you did not create an account, you can safely ignore this email.</p>" +
+                "<div class='footer'>" +
+                "<p>The Krypt Team</p>" +
+                "<img src='https://i.imgur.com/bSRLqMp.png' alt='Logo' />" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
+    }
+
     public void register(RegisterDTO registerDTO) {
         if (userRepository.findByEmail(registerDTO.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
@@ -59,37 +94,7 @@ public class UserService {
         tokenRepository.save(token);
 
         String verificationLink = "http://localhost:8080/api/auth/verify?token=" + tokenValue;
-        emailService.sendEmail(
-                user.getEmail(),
-                "Vérification de votre compte MindVault",
-                "<!DOCTYPE html>" +
-                        "<html lang='fr'>" +
-                        "<head>" +
-                        "<meta charset='UTF-8'>" +
-                        "<style>" +
-                        "  body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }" +
-                        "  .container { background-color: #fff; border-radius: 8px; padding: 30px; max-width: 600px; margin: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }" +
-                        "  h2 { color: #2c3e50; }" +
-                        "  p { font-size: 16px; color: #333; }" +
-                        "  .button { display: inline-block; padding: 12px 24px; margin-top: 20px; background-color: #3498db; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; }" +
-                        "  .footer { margin-top: 40px; font-size: 13px; color: #777; text-align: center; }" +
-                        "</style>" +
-                        "</head>" +
-                        "<body>" +
-                        "<div class='container'>" +
-                        "<h2>Bienvenue " + user.getFirstName() + " !</h2>" +
-                        "<p>Merci de vous être inscrit sur <strong>MindVault</strong>.</p>" +
-                        "<p>Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous :</p>" +
-                        "<a class='button' href='" + verificationLink + "'>Activer mon compte</a>" +
-                        "<p style='margin-top: 30px;'>Si vous n’avez pas créé de compte, ignorez simplement ce message.</p>" +
-                        "<div class='footer'>" +
-                        "<p>La team MindVault</p>" +
-                        "<img src='https://imgur.com/4CavgRB' alt='Logo' style='max-width: 65px; margin-top: 10px; border-radius:50%;'/>" +
-                        "</div>" +
-                        "</div>" +
-                        "</body>" +
-                        "</html>"
-        );
+        emailService.sendEmail(user.getEmail(), "Verify Your Krypt Account", buildVerificationEmail(user, verificationLink));
     }
 
     public void resendVerificationEmail(String email) {
@@ -109,37 +114,7 @@ public class UserService {
         tokenRepository.save(token);
 
         String verificationLink = "http://localhost:8080/api/auth/verify?token=" + tokenValue;
-        emailService.sendEmail(
-                user.getEmail(),
-                "Vérification de votre compte IVI",
-                "<!DOCTYPE html>" +
-                        "<html lang='fr'>" +
-                        "<head>" +
-                        "<meta charset='UTF-8'>" +
-                        "<style>" +
-                        "  body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }" +
-                        "  .container { background-color: #fff; border-radius: 8px; padding: 30px; max-width: 600px; margin: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }" +
-                        "  h2 { color: #2c3e50; }" +
-                        "  p { font-size: 16px; color: #333; }" +
-                        "  .button { display: inline-block; padding: 12px 24px; margin-top: 20px; background-color: #3498db; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; }" +
-                        "  .footer { margin-top: 40px; font-size: 13px; color: #777; text-align: center; }" +
-                        "</style>" +
-                        "</head>" +
-                        "<body>" +
-                        "<div class='container'>" +
-                        "<h2>Bienvenue " + user.getFirstName() + " !</h2>" +
-                        "<p>Merci de vous être inscrit sur <strong>IVI</strong>.</p>" +
-                        "<p>Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous :</p>" +
-                        "<a class='button' href='" + verificationLink + "'>Activer mon compte</a>" +
-                        "<p style='margin-top: 30px;'>Si vous n’avez pas créé de compte, ignorez simplement ce message.</p>" +
-                        "<div class='footer'>" +
-                        "<p>La team IVI</p>" +
-                        "<img src='https://i.imgur.com/XYMp0vv.png' alt='Logo' style='max-width: 65px; margin-top: 10px;'/>" +
-                        "</div>" +
-                        "</div>" +
-                        "</body>" +
-                        "</html>"
-        );
+        emailService.sendEmail(user.getEmail(), "Verify Your Krypt Account", buildVerificationEmail(user, verificationLink));
     }
 
     public String authenticateUser(AuthenticationDTO authenticationDTO) {
