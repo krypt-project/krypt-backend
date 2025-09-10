@@ -4,6 +4,7 @@ import com.krypt.backend.config.JwtUtils;
 import com.krypt.backend.dto.UserDTO.AuthenticationDTO;
 import com.krypt.backend.dto.UserDTO.PasswordChangeDTO;
 import com.krypt.backend.dto.UserDTO.RegisterDTO;
+import com.krypt.backend.dto.UserDTO.VerificationResponseDTO;
 import com.krypt.backend.model.Token;
 import com.krypt.backend.model.User;
 import com.krypt.backend.repository.TokenRepository;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -41,29 +43,52 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO) {
         userService.register(registerDTO);
-        return ResponseEntity.ok("User registered successfully");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "User registered successfully");
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyEmail(@RequestParam("token") String tokenValue) {
-        Token token = tokenRepository.findByToken(tokenValue).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token invalide"));
+    public ResponseEntity<?> verifyEmail(
+            @RequestParam("token") String tokenValue,
+            @RequestHeader(value = "Accept", defaultValue = "application/json") String acceptHeader) {
 
-        if (token.isExpired() || token.isRevoked()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token expired");
-        }
+        Token token = tokenRepository.findByToken(tokenValue)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token invalide"));
 
         User user = token.getUser();
-        if (user.isEmailVerified()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("This account is already verified");
+
+        if (token.isExpired() || token.isRevoked()) {
+            if (acceptHeader.contains("text/html")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("<h1>Token expired</h1>");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new VerificationResponseDTO(false));
+            }
         }
 
-        user.setEmailVerified(true);
-        userRepository.save(user);
-        tokenRepository.delete(token);
+        if (!user.isEmailVerified()) {
+            user.setEmailVerified(true);
+            userRepository.save(user);
+            tokenRepository.delete(token);
+        }
 
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("http://localhost:3000/account-verified"))
-                .build();
+        if (acceptHeader.contains("text/html")) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create("http://localhost:3000/account-verified"))
+                    .build();
+        } else {
+            return ResponseEntity.ok(new VerificationResponseDTO(true));
+        }
+    }
+
+    @GetMapping("/is-verified")
+    public ResponseEntity<VerificationResponseDTO> isVerified(@RequestParam("email") String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return ResponseEntity.ok(new VerificationResponseDTO(user.isEmailVerified()));
     }
 
     @GetMapping("/resend-verification")
