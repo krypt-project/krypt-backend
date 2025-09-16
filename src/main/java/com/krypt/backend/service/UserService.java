@@ -4,6 +4,7 @@ import com.krypt.backend.config.JwtUtils;
 import com.krypt.backend.dto.UserDTO.AuthenticationDTO;
 import com.krypt.backend.dto.UserDTO.PasswordChangeDTO;
 import com.krypt.backend.dto.UserDTO.RegisterDTO;
+import com.krypt.backend.dto.UserDTO.UserDTO;
 import com.krypt.backend.model.Token;
 import com.krypt.backend.model.User;
 import com.krypt.backend.model.enums.TokenType;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -154,5 +156,16 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
         userRepository.save(user);
+    }
+
+    /* USER INFO */
+    public Optional<UserDTO> getUserInfoByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(user -> new UserDTO(
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getCreationDate()
+                ));
     }
 }
