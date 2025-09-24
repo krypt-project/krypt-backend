@@ -1,5 +1,6 @@
 package com.krypt.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -24,6 +25,11 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    @JsonBackReference
+    private Role role;
 
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -88,6 +94,10 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public Role getRole() { return role; }
+
+    public void setRole(Role role) { this.role = role; }
 
     public String getCreationDate() {
         return creationDate;
