@@ -1,15 +1,19 @@
 package com.krypt.backend.dto.UserDTO;
 
+import com.krypt.backend.model.Role;
+
 public class UserDTO {
     private String firstName;
     private String lastName;
     private String email;
+    private Role role;
     private String creationDate;
 
-    public UserDTO(String firstName, String lastName, String email, String creationDate) {
+    public UserDTO(String firstName, String lastName, String email, Role role, String creationDate) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.role = role;
         this.creationDate = creationDate;
     }
 
@@ -36,6 +40,14 @@ public class UserDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String getCreationDate() {
