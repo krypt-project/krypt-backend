@@ -1,9 +1,12 @@
 package com.krypt.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.krypt.backend.model.enums.RoleType;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "role_table")
@@ -29,15 +32,20 @@ public class Role {
     @Column(length = 500)
     private String description;
 
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<User> users = new ArrayList<>();
+
     // Constructor
     public Role() {}
 
-    public Role(RoleType roleType, Integer maxStorageGb, Integer aiQuota, BigDecimal pricePerMonth, String description) {
+    public Role(RoleType roleType, Integer maxStorageGb, Integer aiQuota, BigDecimal pricePerMonth, String description, List<User> users) {
         this.roleType = roleType;
         this.maxStorageGb = maxStorageGb;
         this.aiQuota = aiQuota;
         this.pricePerMonth = pricePerMonth;
         this.description = description;
+        this.users = users;
     }
 
     // Getter & Setter
@@ -87,5 +95,13 @@ public class Role {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }
