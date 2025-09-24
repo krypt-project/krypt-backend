@@ -7,6 +7,7 @@ import com.krypt.backend.repository.NoteRepository;
 import com.krypt.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -24,6 +25,7 @@ public class NoteService {
         note.setUser(user);
         note.setTitle(noteDTO.getTitle());
         note.setContent(noteDTO.getContent());
+        note.setCreationDate(noteDTO.getModificationDate());
         return noteRepository.save(note);
     }
 
@@ -55,6 +57,7 @@ public class NoteService {
         Note note = getNoteById(noteID, user);
         note.setTitle(noteDTO.getTitle());
         note.setContent(noteDTO.getContent());
+        note.setModificationDate(noteDTO.getModificationDate());
         return noteRepository.save(note);
     }
 
