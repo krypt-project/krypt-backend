@@ -5,9 +5,12 @@ import com.krypt.backend.dto.UserDTO.AuthenticationDTO;
 import com.krypt.backend.dto.UserDTO.PasswordChangeDTO;
 import com.krypt.backend.dto.UserDTO.RegisterDTO;
 import com.krypt.backend.dto.UserDTO.UserDTO;
+import com.krypt.backend.model.Role;
 import com.krypt.backend.model.Token;
 import com.krypt.backend.model.User;
+import com.krypt.backend.model.enums.RoleType;
 import com.krypt.backend.model.enums.TokenType;
+import com.krypt.backend.repository.RoleRepository;
 import com.krypt.backend.repository.TokenRepository;
 import com.krypt.backend.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.krypt.backend.model.enums.RoleType.STUDENT;
+
 
 @Service
 public class UserService {
@@ -29,14 +34,16 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
+    private final RoleRepository roleRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TokenRepository tokenRepository, EmailService emailService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TokenRepository tokenRepository, EmailService emailService, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
+        this.roleRepository = roleRepository;
     }
 
     private String buildVerificationEmail(User user, String verificationLink) {
@@ -79,10 +86,13 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
 
+        Role role = roleRepository.findByRoleType(STUDENT).orElseThrow(() -> new RuntimeException("Role not found"));
+
         User user = new User();
         user.setFirstName(registerDTO.getFirstName());
         user.setLastName(registerDTO.getLastName());
         user.setEmail(registerDTO.getEmail());
+        user.setRole(role);
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
         userRepository.save(user);
 
@@ -165,6 +175,7 @@ public class UserService {
                         user.getFirstName(),
                         user.getLastName(),
                         user.getEmail(),
+                        user.getRole(),
                         user.getCreationDate()
                 ));
     }
