@@ -1,10 +1,7 @@
 package com.krypt.backend.service;
 
 import com.krypt.backend.config.JwtUtils;
-import com.krypt.backend.dto.UserDTO.AuthenticationDTO;
-import com.krypt.backend.dto.UserDTO.PasswordChangeDTO;
-import com.krypt.backend.dto.UserDTO.RegisterDTO;
-import com.krypt.backend.dto.UserDTO.UserDTO;
+import com.krypt.backend.dto.UserDTO.*;
 import com.krypt.backend.model.Role;
 import com.krypt.backend.model.Token;
 import com.krypt.backend.model.User;
@@ -178,5 +175,30 @@ public class UserService {
                         user.getRole(),
                         user.getCreationDate()
                 ));
+    }
+
+    public Optional<UserDTO> PatchUserInfoByEmail(String email, PatchUserDTO patchUserDTO){
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isEmpty()){
+            throw new RuntimeException("User not found");
+        }
+
+        User user = userOptional.get();
+
+        if(patchUserDTO.getFirstName() != null){
+            user.setFirstName(patchUserDTO.getFirstName());
+        }
+        if(patchUserDTO.getLastName() != null){
+            user.setLastName(patchUserDTO.getLastName());
+        }
+        userRepository.save(user);
+
+        return Optional.of(new UserDTO(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getCreationDate()
+        ));
     }
 }
