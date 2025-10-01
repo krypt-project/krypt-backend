@@ -73,7 +73,7 @@ public class NoteServiceTest {
         note.setContent("Some content");
         notes.add(note);
 
-        when(noteRepository.findByUser(user)).thenReturn(notes);
+        when(noteRepository.findByUserOrderByTitleAsc(user)).thenReturn(notes);
 
         List<Note> result = noteService.getUserNotes(user);
 
@@ -84,7 +84,7 @@ public class NoteServiceTest {
 
     @Test
     void getUserNotesShouldReturnNewDefaultNoteIfNotExists() {
-        when(noteRepository.findByUser(user)).thenReturn(new ArrayList<>());
+        when(noteRepository.findByUserOrderByTitleAsc(user)).thenReturn(new ArrayList<>());
 
         Note defaultNote = new Note();
         defaultNote.setUser(user);
