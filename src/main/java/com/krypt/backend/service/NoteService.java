@@ -30,7 +30,7 @@ public class NoteService {
     }
 
     public List<Note> getUserNotes(User user) {
-        List<Note> notes = noteRepository.findByUser(user);
+        List<Note> notes = noteRepository.findByUserOrderByTitleAsc(user);
 
         if (notes.isEmpty()) {
             Note defaultNote = new Note();
