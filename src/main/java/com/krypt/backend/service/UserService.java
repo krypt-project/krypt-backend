@@ -133,7 +133,7 @@ public class UserService {
 
         String jwt = jwtUtils.generateToken(
                 authentication.getName(),
-                "notes:read", "notes:write", "notes:tags", "notes:summarize"
+                "notes:read", "notes:write", "notes:tags", "notes:summarize", "chatbot:generate"
         );
 
         User user = userRepository.findByEmail(authenticationDTO.getEmail())
