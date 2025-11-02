@@ -1,4 +1,4 @@
-package com.mindvault.backend;
+package com.krypt.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
